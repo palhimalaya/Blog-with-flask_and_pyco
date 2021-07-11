@@ -12,6 +12,7 @@ from functools import wraps
 from flask import abort
 import smtplib
 import os
+from datetime import datetime as dt
 
 my_email = os.environ.get("MY_EMAIL")
 password = os.environ.get("MY_PASSWORD")
@@ -30,6 +31,7 @@ login_manager.init_app(app)
 gravatar = Gravatar(app, size=100, rating='g', default='retro',
                     force_default=False, force_lower=False,
                     use_ssl=False, base_url=None)
+
 
 # Create admin-only decorator
 def admin_only(f):
@@ -95,11 +97,10 @@ class Comment(db.Model):
 
 # db.create_all()
 
-
 @app.route('/')
 def get_all_posts():
     posts = BlogPost.query.all()
-    return render_template("index.html", all_posts=posts, logged_in=current_user.is_authenticated)
+    return render_template("index.html", all_posts=posts, logged_in=current_user.is_authenticated, year=dt.now().year)
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -128,7 +129,7 @@ def register():
 
             return redirect(url_for("get_all_posts"))
 
-    return render_template("register.html", form=form, logged_in=current_user.is_authenticated)
+    return render_template("register.html", form=form, logged_in=current_user.is_authenticated, year=dt.now().year)
 
 
 @app.route('/login', methods=["POST", "GET"])
@@ -146,7 +147,7 @@ def login():
         else:
             flash('The password is incorrect, Please try again.')
 
-    return render_template("login.html", form=form, logged_in=current_user.is_authenticated)
+    return render_template("login.html", form=form, logged_in=current_user.is_authenticated, year=dt.now().year)
 
 
 @app.route('/logout')
@@ -156,7 +157,7 @@ def logout():
     return redirect(url_for('get_all_posts'))
 
 
-@app.route("/post/<int:post_id>", methods=["GET","POST"])
+@app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
     form = CommentForm()
     requested_post = BlogPost.query.get(post_id)
@@ -173,12 +174,12 @@ def show_post(post_id):
         db.session.add(new_comment)
         db.session.commit()
     return render_template("post.html", form=form, post=requested_post,
-                           logged_in=current_user.is_authenticated)
+                           logged_in=current_user.is_authenticated, year=dt.now().year)
 
 
 @app.route("/about")
 def about():
-    return render_template("about.html", logged_in=current_user.is_authenticated)
+    return render_template("about.html", logged_in=current_user.is_authenticated, year=dt.now().year)
 
 
 @app.route("/contact", methods=["POST", "GET"])
@@ -187,7 +188,7 @@ def contact():
         data = request.form
         send_mail(data["username"], data["email"], data["phone"], data["message"])
         return render_template("contact.html", msg_sent=True)
-    return render_template("contact.html", msg_sent=False, logged_in=current_user.is_authenticated)
+    return render_template("contact.html", msg_sent=False, logged_in=current_user.is_authenticated, year=dt.now().year)
 
 
 def send_mail(username, email, phone, message):
@@ -214,7 +215,7 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated)
+    return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated, year=dt.now().year)
 
 
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
@@ -235,7 +236,7 @@ def edit_post(post_id):
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
 
-    return render_template("make-post.html", form=edit_form)
+    return render_template("make-post.html", form=edit_form, year=dt.now().year)
 
 
 @app.route("/delete/<int:post_id>")
@@ -249,7 +250,7 @@ def delete_post(post_id):
 
 @app.route("/portfolio")
 def portfolio():
-    return render_template("Himal.html", logged_in=current_user.is_authenticated)
+    return render_template("Himal.html", logged_in=current_user.is_authenticated, year=dt.now().year)
 
 
 if __name__ == "__main__":
