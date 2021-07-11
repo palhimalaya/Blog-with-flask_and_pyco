@@ -250,7 +250,7 @@ def delete_post(post_id):
 
 @app.route("/portfolio")
 def portfolio():
-    return render_template("Himal.html")
+    return render_template("Himal.html", logged_in=current_user.is_authenticated)
 
 
 if __name__ == "__main__":
