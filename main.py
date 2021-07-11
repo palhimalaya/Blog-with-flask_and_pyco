@@ -17,7 +17,7 @@ my_email = os.environ.get("MY_EMAIL")
 password = os.environ.get("MY_PASSWORD")
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "dtydtdsu675635rfghfghjsdrte65")
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
@@ -93,7 +93,7 @@ class Comment(db.Model):
     text = db.Column(db.Text, nullable=False)
 
 
-db.create_all()
+# db.create_all()
 
 
 @app.route('/')
@@ -231,7 +231,6 @@ def edit_post(post_id):
         post.title = edit_form.title.data
         post.subtitle = edit_form.subtitle.data
         post.img_url = edit_form.img_url.data
-        post.author = current_user.name
         post.body = edit_form.body.data
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
